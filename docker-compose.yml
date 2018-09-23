@@ -1,0 +1,46 @@
+version: "3"
+
+networks:
+  gitea:
+
+volumes:
+  gitea:
+  pgdata:
+
+services:
+  server:
+    image: gitea/gitea:latest
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+      - APP_NAME=Gitea Docker deployment
+      - RUN_MODE=prod
+      - DISABLE_SSH=true
+      - DB_TYPE=postgres
+      - DB_HOST=db:5432
+      - DB_USER=gitea
+      - DB_PASSWD=gitea
+      # CHANGE THIS!
+      - SECRET_KEY=password2342changeme
+    restart: always
+    networks:
+      - gitea
+    volumes:
+      - gitea
+    ports:
+      - "4000:3000"
+      - "222:22"
+    depends_on:
+      - db
+
+  db:
+    image: postgres:9.6
+    restart: always
+    environment:
+      - POSTGRES_USER=gitea
+      - POSTGRES_PASSWORD=gitea
+      - POSTGRES_DB=gitea
+    networks:
+      - gitea
+    volumes:
+      - pgdata
